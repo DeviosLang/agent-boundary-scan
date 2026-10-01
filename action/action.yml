@@ -1,0 +1,18 @@
+name: agent-boundary-scan
+description: Fail the build if a repo can hijack an AI coding agent (Claude Code / Codex / Cursor).
+inputs:
+  path: {description: path to scan, default: ".", required: false, default: "."}
+  fail-on: {description: severity gate, default: "high", required: false, default: "high"}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with: {python-version: "3.11"}
+    - name: run abs
+      shell: bash
+      run: |
+        python3 -m pip install --quiet .
+        python3 -m abs_scan "${{ inputs.path }}" --fail-on "${{ inputs.fail-on }}"
+branding:
+  icon: shield
+  color: purple

@@ -1,0 +1,28 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "${{ matrix.python-version }}"}
+      - run: python -m pip install -U pip && python -m pip install -e ".[dev]"
+      - run: pytest -q
+      - name: dogfood (scan this repo, fail on high)
+        run: python -m abs_scan . --fail-on high
+  sarif:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: python -m pip install -U pip && python -m pip install .
+      - run: abs . --format sarif > abs.sarif
+      - uses: github/codeql-action/upload-sarif@v3
+        with: {sarif_file: abs.sarif}

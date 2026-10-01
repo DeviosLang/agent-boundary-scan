@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-boundary-scan"
+version = "0.1.0"
+description = "Find the places where a repository can make an AI coding agent (Claude Code / Codex / gemini-cli / Cursor) execute code."
+readme = "README.md"
+requires-python = ">=3.9"
+license = {file = "LICENSE"}
+keywords = ["security", "ai", "agent", "llm", "git", "mcp", "sast", "supply-chain"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+    "Topic :: Software Development :: Version Control :: Git",
+]
+# TODO(owner): replace with your name / handle before publishing to PyPI.
+authors = [{name = "CHANGE-ME", email = "CHANGE-ME@example.com"}]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://github.com/CHANGE-ME/agent-boundary-scan"
+Issues = "https://github.com/CHANGE-ME/agent-boundary-scan/issues"
+
+[project.scripts]
+abs = "abs_scan.cli:main"
+
+[tool.setuptools]
+packages = ["abs_scan"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
