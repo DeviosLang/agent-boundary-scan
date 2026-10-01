@@ -96,7 +96,12 @@ pip install -e ".[dev]" && pytest -q        # 13 tests: fixture A/B, SARIF shape
 - [ ] single-binary Rust build for air-gapped CI
 - [ ] commercial rule pack (enterprise policy + reporting)
 
-## License
+## Commercial
 
-AGPL-3.0-or-later. **Detection rules are the product** — the enterprise rule pack ships under a
-commercial license.
+AGPL-3.0-or-later. **Detection rules are the product** — org policy rules, reporting/compliance
+export, central rule management and support ship as a commercial rule pack under separate terms.
+If you run coding agents on code you do not fully control and want that, get in touch
+(issues are fine for a first contact).
+
+Vendor-boundary security reviews and agent-hardening consulting are available on the same subject:
+repository-controlled execution surfaces, approval-parser differentials, MCP and config surfaces.
