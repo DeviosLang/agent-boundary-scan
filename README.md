@@ -53,13 +53,12 @@ agent-boundary-scan 0.1.0 - AI coding agent boundary risks
 the boundary runs in the same environment it polices, and takes its parameters from untrusted input
 (a repo, an issue, a patch, a tool result). `abs` turns that into a check you can run in CI.
 
-Note the asymmetry that makes this class hard to close: git's execution sinks split into
-**fixed-name** ones (`core.hooksPath`, `core.fsmonitor`, … — a vendor can pin them by name) and
-**repository-named** ones (`filter.<name>.process`, `diff.<name>.textconv` — the name comes from
-`.gitattributes`, so no fixed key list can enumerate it). `git status` rejects the flags that
-neutralise the diff drivers, so the filter sink stays live on the one command every agent runs
-before you type anything. `abs` reports the repo side of that: if a repo in your supply chain ships
-a filter driver, an MCP server, or a `GIT_*` env channel, you will see it here.
+Note the asymmetry that makes this class awkward to close: git's execution sinks split into
+**fixed-name** ones (`core.hooksPath`, `core.fsmonitor`, …) and **repository-named** ones
+(`filter.<name>.process`, `diff.<name>.textconv` — the name comes from `.gitattributes`, so a list
+of known keys cannot enumerate it). `abs` reports the repository side of that: a filter driver, an
+MCP server, or a `GIT_*` env channel shipped inside a repository is something you want to see
+before anything automated opens it.
 
 ## Scope: what this is not
 
