@@ -71,6 +71,14 @@ before anything automated opens it.
 mitigation, and it says nothing about whether a given agent is vulnerable. Vendor-side
 differential tooling lives in a separate project.
 
+## Demo (one command, ~2 seconds)
+
+```bash
+./scripts/demo.sh
+```
+Builds both fixtures and shows text / json / SARIF output and the CI gate exiting 1 on the hostile
+repo and 0 on the clean one. Nothing destructive, no network.
+
 ## Fixtures
 
 ```bash
