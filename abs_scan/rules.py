@@ -255,6 +255,101 @@ def rule_env_channels(root: Path):
                         break
 
 
+
+# ---------- repo-controlled auto-execution surfaces ----------
+# These are documented features, not bugs: each is a place where a repository ships
+# something that runs on its own when a tool opens the directory. An agent that
+# opens the folder inherits all of them.
+def rule_devcontainer(root: Path):
+    import json as _json
+    for p in list(root.glob(".devcontainer/devcontainer.json")) + list(root.glob(".devcontainer/*/devcontainer.json")):
+        d = _load_json(p)
+        if not isinstance(d, dict):
+            continue
+        for key in ("initializeCommand", "onCreateCommand", "postCreateCommand",
+                    "postStartCommand", "postAttachCommand"):
+            if key in d:
+                yield F("DEV-001", f"devcontainer lifecycle command '{key}' runs when the container is created",
+                        "high", p, f"{key}: {str(d[key])[:120]}", ["CWE-829"],
+                        "Review devcontainer lifecycle commands before opening the folder in a container.")
+        cust = d.get("customizations") or {}
+        exts = (cust.get("vscode") or {}).get("extensions") or []
+        if exts:
+            yield F("DEV-002", f"devcontainer installs {len(exts)} editor extension(s) automatically "
+                               "(extensions execute code in the editor host)",
+                    "medium", p, ",".join(map(str, exts[:3]))[:160], ["CWE-829"],
+                    "Pin the extension list; a repository should not choose your editor's code.")
+
+
+def rule_vscode_tasks(root: Path):
+    import json as _json
+    for p in list(root.glob(".vscode/tasks.json")):
+        d = _load_json(p)
+        if not isinstance(d, dict):
+            continue
+        for t in (d.get("tasks") or []):
+            if not isinstance(t, dict):
+                continue
+            run_on = ((t.get("runOptions") or {}).get("runOn")) or t.get("runOn")
+            if run_on in ("folderOpen", "default"):
+                cmd = t.get("command") or (t.get("dependsOn") or "")
+                yield F("VS-001", f"VS Code task '{t.get('label', '?')}' is set to run on folder open",
+                        "high", p, f"runOn={run_on} command={str(cmd)[:100]}", ["CWE-829"],
+                        "Tasks with runOn: folderOpen execute automatically when the folder opens.")
+
+
+HOOK_DIRS = [".husky", ".husky/_", ".lefthook", ".lefthook-local", ".git-hooks", ".githooks", ".pre-commit-config.yaml"]
+HOOK_FILES = ["pre-commit", "post-checkout", "post-merge", "pre-push", "prepare-commit-msg",
+              "post-index-change"]
+
+
+def rule_repo_hooks(root: Path):
+    """Hook scripts shipped inside the repository (husky / lefthook / pre-commit / plain .githooks).
+
+    `core.hooksPath` (often set by husky or lefthook at install time) points git at a directory
+    inside the repository, so these are ordinary committed files that git will execute.
+    """
+    for d in HOOK_DIRS:
+        cand = root / d
+        if cand.is_file() and d.endswith(".yaml"):
+            yield F("HK-001", "repo ships a pre-commit (pre-commit.com) configuration that runs hooks",
+                    "medium", cand, d, ["CWE-829"],
+                    "Review the hooks named in .pre-commit-config.yaml; they run on git operations.")
+            continue
+        if not cand.is_dir():
+            continue
+        for name in sorted(os.listdir(cand)):
+            if name in HOOK_FILES or name.endswith((".sh", ".py", ".js")):
+                yield F("HK-001", f"repo ships a git hook script '{d}/{name}'",
+                        "medium", cand / name, f"{d}/{name}", ["CWE-829"],
+                        "Hooks must be user-owned and outside the repository.")
+
+
+def rule_direnv(root: Path):
+    for p in list(root.glob(".envrc")) + list(root.glob(".direnv/*")):
+        if p.is_file():
+            txt = p.read_text(errors="replace")
+            if any(k in txt for k in ("use ", "source_env", "layout", "PATH=", "eval")):
+                yield F("EN-001", "direnv .envrc executes shell on entering the directory",
+                        "medium", p, txt[:120].replace("\n", " "), ["CWE-829"],
+                        "direnv requires `direnv allow`; never grant it to an untrusted tree.")
+
+
+def rule_install_scripts(root: Path):
+    import json as _json
+    for p in list(root.glob("package.json")):
+        d = _load_json(p)
+        if not isinstance(d, dict):
+            continue
+        scripts = d.get("scripts") or {}
+        for key in ("preinstall", "install", "postinstall", "prepare", "prepublishOnly"):
+            if key in scripts:
+                sev = "high" if key in ("preinstall", "install", "postinstall") else "medium"
+                yield F("PKG-001", f"package.json '{key}' script runs on `npm install`",
+                        sev, p, f"{key}: {str(scripts[key])[:120]}", ["CWE-829"],
+                        "Agents commonly run npm install; lifecycle scripts execute with it. "
+                        "Use `npm install --ignore-scripts` on a tree you have not reviewed.")
+
 # ---------- filesystem family ----------
 def rule_symlinks(root: Path, max_entries=20000):
     n = 0
@@ -278,4 +373,6 @@ def rule_symlinks(root: Path, max_entries=20000):
 
 RULES = [rule_git_config, rule_gitattributes_filter, rule_git_path_confusion,
          rule_claude_settings, rule_context_injection, rule_mcp,
-         rule_codex_config, rule_env_channels, rule_symlinks]
+         rule_codex_config, rule_env_channels,
+         rule_devcontainer, rule_vscode_tasks, rule_repo_hooks, rule_direnv,
+         rule_install_scripts, rule_symlinks]

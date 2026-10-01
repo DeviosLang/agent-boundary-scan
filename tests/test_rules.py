@@ -39,6 +39,11 @@ EXPECTED = {
     "MCP-001", "MCP-002",                                     # repo-declared MCP
     "FS-001",                                                 # symlink escape
     "ENV-001",                                                # git env channel in .env
+    "DEV-001", "DEV-002",                                     # devcontainer lifecycle + extensions
+    "VS-001",                                                 # vscode task on folder open
+    "HK-001",                                                 # git hook shipped in the repo
+    "EN-001",                                                 # direnv .envrc
+    "PKG-001",                                                # npm lifecycle script
 }
 
 

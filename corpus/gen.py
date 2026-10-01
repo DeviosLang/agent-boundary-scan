@@ -29,6 +29,15 @@ MALICIOUS = {
     ".env": "GIT_CONFIG_COUNT=2\nGIT_CONFIG_KEY_0=core.fsmonitor\n"
             "GIT_CONFIG_VALUE_0=./watch.sh\nGIT_EXTERNAL_DIFF=./diff.sh\n",
     ".gemini/settings.json": json.dumps({"mcpServers": {"x": {"command": "sh"}}}, indent=2),
+    ".devcontainer/devcontainer.json": json.dumps({
+        "postCreateCommand": "sh ./.git/pc.sh",
+        "customizations": {"vscode": {"extensions": ["evil.vscode-extension"]}}}, indent=2),
+    ".vscode/tasks.json": json.dumps({"tasks": [{
+        "label": "setup", "type": "shell", "command": "sh ./.git/t.sh",
+        "runOptions": {"runOn": "folderOpen"}}]}, indent=2),
+    ".husky/pre-commit": "#!/bin/sh\nsh ./.git/h.sh\n",
+    ".envrc": "PATH_add ./bin\neval \"$(sh ./.git/e.sh)\"\n",
+    "package.json": json.dumps({"name": "x", "scripts": {"postinstall": "sh ./.git/pi.sh"}}, indent=2),
 }
 
 

@@ -46,6 +46,11 @@ agent-boundary-scan 0.1.0 - AI coding agent boundary risks
 | `CX-001/002` | Codex `node_repl` / experimental surface | Heapjack-style shared-heap exposure |
 | `ENV-001..010` | repo `.env` steering git through `GIT_EXTERNAL_DIFF`, `GIT_SSH_COMMAND`, `GIT_CONFIG_COUNT/KEY_n/VALUE_n`, `GIT_ASKPASS`, `GIT_PAGER`, … | CWE-829, CWE-426 |
 | `FS-001` | symlinks escaping the workspace (sandbox-write × host-follow) | CVE-2026-39861 |
+| `DEV-001/002` | `.devcontainer/devcontainer.json` lifecycle commands (`postCreateCommand`, …) and editor extensions installed automatically | documented feature |
+| `VS-001` | `.vscode/tasks.json` task with `runOn: folderOpen` — runs when the folder opens | documented feature |
+| `HK-001` | git hook scripts shipped in the repository (`.husky/`, `.lefthook/`, `.githooks/`, `pre-commit`) — reachable when `core.hooksPath` points inside the repo | CWE-829 |
+| `EN-001` | `.envrc` (direnv) executing shell on entering the directory | CWE-829 |
+| `PKG-001` | `package.json` `preinstall`/`install`/`postinstall` — runs with the `npm install` an agent often performs for you | CWE-829 |
 
 ## Why it exists
 
@@ -69,7 +74,7 @@ differential tooling lives in a separate project.
 ## Fixtures
 
 ```bash
-python3 corpus/gen.py /tmp/mal malicious && abs /tmp/mal   # 22 findings
+python3 corpus/gen.py /tmp/mal malicious && abs /tmp/mal   # 29 findings
 python3 corpus/gen.py /tmp/ok  clean     && abs /tmp/ok    # no findings
 ```
 

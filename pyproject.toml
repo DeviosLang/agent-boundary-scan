@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-boundary-scan"
-version = "0.1.0"
+version = "0.2.0"
 description = "Find the places where a repository can make an AI coding agent (Claude Code / Codex / gemini-cli / Cursor) execute code."
 readme = "README.md"
 requires-python = ">=3.9"
