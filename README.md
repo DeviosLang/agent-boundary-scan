@@ -103,6 +103,12 @@ pip install -e ".[dev]" && pytest -q        # 13 tests: fixture A/B, SARIF shape
 
 ## Commercial
 
+## Related
+
+[mcp-surface-scan](https://github.com/DeviosLang/mcp-surface-scan) asks the sibling question about
+**MCP servers**: what does a declared server get to reach (launch-time package resolution, remote
+endpoints, credentials in env, host-reaching container flags, path arguments that mean "everything")?
+
 AGPL-3.0-or-later. **Detection rules are the product** — org policy rules, reporting/compliance
 export, central rule management and support ship as a commercial rule pack under separate terms.
 If you run coding agents on code you do not fully control and want that, get in touch
